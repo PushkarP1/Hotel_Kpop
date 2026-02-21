@@ -1,0 +1,1481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- =========================================================
+  KOKO — One-page portfolio site (GitHub Pages friendly)
+  + Login gate (client-side "polite gate", NOT real security)
+  + Accessible mobile nav (hamburger)
+  + Fixed anchor scrolling for sections (header offset)
+  + Heavily commented for designers
+  ========================================================== -->
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOKO — Boutique Hotel • Ha Long Bay</title>
+  <meta name="description" content="KOKO is a bright, K-pop inspired boutique hotel concept in Ha Long Bay, Vietnam." />
+
+  <!-- Font (swap if you want) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       0) IMPORTANT: fixed header + smooth scroll fixes
+       ---------------------------------------------------------
+       - The header is fixed (always on top).
+       - When you click a nav link (#stay), we want the section
+         heading to appear BELOW the fixed header.
+       This line fixes that.
+       ========================================================= */
+    section { scroll-margin-top: calc(var(--navH) + 16px); }
+
+    /* Smooth scroll (auto-disabled via prefers-reduced-motion) */
+    html { scroll-behavior: smooth; }
+
+    /* =========================================================
+       1) DESIGN TOKENS (EDIT THESE FIRST)
+       ========================================================= */
+    :root{
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface2: #f7f8ff;
+      --text: #12131a;
+      --muted: #4b5163;
+      --line: #d9dce7;
+
+      /* Accent colors (edit these for your palette) */
+      --pink:  #d81b60;
+      --cyan:  #0077b6;
+      --violet:#5b3df5;
+      --gold:  #b86b00;
+
+      --radius: 18px;
+      --radius2: 14px;
+      --shadow: 0 18px 55px rgba(16, 24, 40, .12);
+      --max: 1180px;
+      --navH: 72px;
+
+      /* Keyboard focus ring (WCAG friendly) */
+      --focus: 0 0 0 3px rgba(0,119,182,.25), 0 0 0 6px rgba(91,61,245,.18);
+
+      /* Background glows (edit intensity by changing alpha numbers) */
+      --bgGlow1: rgba(216,27,96,.08);
+      --bgGlow2: rgba(0,119,182,.10);
+      --bgGlow3: rgba(91,61,245,.08);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 700px at 10% 0%,  var(--bgGlow1), transparent 55%),
+        radial-gradient(900px 650px  at 90% 10%, var(--bgGlow2), transparent 55%),
+        radial-gradient(900px 650px  at 55% 90%, var(--bgGlow3), transparent 55%),
+        var(--bg);
+      overflow-x:hidden;
+    }
+
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width: var(--max); margin:0 auto; padding:0 20px;}
+
+    /* =========================================================
+       2) ACCESSIBILITY HELPERS
+       ========================================================= */
+    .skip{
+      position:absolute; left:12px; top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+      transform: translateY(-130%);
+      transition: transform .18s ease;
+      z-index: 1000;
+    }
+    .skip:focus{
+      transform: translateY(0);
+      outline:none;
+      box-shadow: var(--focus), var(--shadow);
+    }
+    .sr-only{
+      position:absolute !important; width:1px; height:1px;
+      padding:0; margin:-1px; overflow:hidden;
+      clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
+
+    /* =========================================================
+       3) LOGIN GATE (simple login screen)
+       ---------------------------------------------------------
+       IMPORTANT:
+       - GitHub Pages is static. This is NOT real security.
+       - This is a "polite gate" for portfolio viewing.
+       Logo recommendation:
+       - SVG is usually best (crisp + small file)
+       - PNG is fine too
+       ========================================================= */
+    .gate{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none; /* JS will turn this ON (grid) if locked */
+      place-items: center;
+      padding: 22px;
+      background:
+        radial-gradient(900px 600px at 15% 10%, rgba(216,27,96,.10), transparent 55%),
+        radial-gradient(900px 600px at 85% 20%, rgba(0,119,182,.12), transparent 55%),
+        linear-gradient(180deg, #ffffff, #fbfbff);
+    }
+    .gateCard{
+      width: min(520px, 96vw);
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 30px 90px rgba(16, 24, 40, .16);
+      overflow:hidden;
+    }
+    .gateIn{padding: 18px 18px 16px;}
+    .gateTop{display:flex; align-items:center; gap: 12px; margin-bottom: 12px;}
+    .gateLogo{
+      width: 44px; height: 44px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: #fff;
+      display:grid; place-items:center;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .gateLogo img{width:100%; height:100%; object-fit:contain; display:block;}
+    .gateTitle{margin:0; font-size: 16px; letter-spacing: -0.01em;}
+    .gateSub{margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5;}
+
+    .gateForm{display:grid; gap: 10px; margin-top: 12px;}
+    .field{display:grid; gap: 6px;}
+    label{font-size: 12px; color: var(--muted);}
+
+    input[type="password"]{
+      width: 100%;
+      height: 46px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: #fff;
+      padding: 0 12px;
+      font-size: 14px;
+      color: #12131a;
+    }
+    input[type="password"]:focus{outline:none; box-shadow: var(--focus);}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      color: #11131a;
+      cursor:pointer;
+      box-shadow: 0 10px 28px rgba(16, 24, 40, .08);
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      white-space:nowrap;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .btn:hover{transform: translateY(-1px); background: #fff; box-shadow: 0 16px 40px rgba(16,24,40,.12)}
+    .btn:focus{outline:none; box-shadow: var(--focus), 0 16px 40px rgba(16,24,40,.12)}
+    .btnPrimary{
+      border-color: rgba(216,27,96,.30);
+      background: linear-gradient(135deg, rgba(216,27,96,.95), rgba(0,119,182,.92), rgba(91,61,245,.92));
+      color:#fff;
+    }
+    .gateHint{
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .gateHint a{
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .gateError{
+      display:none;
+      margin: 8px 0 0;
+      font-size: 12px;
+      color: #b00020;
+    }
+
+    /* The actual site content (hidden until unlocked) */
+    #site[hidden]{ display:none; }
+
+    /* =========================================================
+       4) TOP NAV / HEADER
+       ========================================================= */
+    header.nav{
+      position:fixed; inset:0 0 auto 0; z-index: 200;
+      height: var(--navH);
+      background: rgba(255,255,255,.86);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .navIn{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 16px;
+    }
+
+    /* Clicking the logo should scroll to the hero (#top) */
+    .brand{display:flex; align-items:center; gap:12px; min-width: 160px;}
+    .brand img{height: 34px; width:auto; display:block;} /* logo size */
+
+    nav.primary{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex-wrap:wrap;
+    }
+    nav.primary a{
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      color: #202331;
+      border: 1px solid transparent;
+      transition: background .18s ease, transform .18s ease, border-color .18s ease;
+    }
+    nav.primary a:hover{
+      background: rgba(91,61,245,.07);
+      border-color: rgba(91,61,245,.20);
+      transform: translateY(-1px);
+    }
+    nav.primary a:focus{outline:none; box-shadow: var(--focus);}
+
+    .navRight{
+      display:flex; align-items:center; gap:10px;
+      min-width: 220px;
+      justify-content:flex-end;
+    }
+
+    /* =========================================================
+       5) MOBILE NAV (hamburger) — accessible
+       ========================================================= */
+    .hamburger{
+      display:none; /* shown only on small screens */
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 28px rgba(16, 24, 40, .08);
+      cursor:pointer;
+      position:relative;
+    }
+    .hamburger:focus{outline:none; box-shadow: var(--focus), 0 16px 40px rgba(16,24,40,.12)}
+    .hamburger .line{
+      position:absolute;
+      left: 12px; right: 12px;
+      height: 2px;
+      background: #1a1c25;
+      border-radius: 99px;
+      transition: transform .18s ease, top .18s ease, opacity .18s ease;
+    }
+    .hamburger .l1{top: 15px}
+    .hamburger .l2{top: 21px}
+    .hamburger .l3{top: 27px}
+    .hamburger[aria-expanded="true"] .l1{top: 21px; transform: rotate(45deg)}
+    .hamburger[aria-expanded="true"] .l2{opacity:0}
+    .hamburger[aria-expanded="true"] .l3{top: 21px; transform: rotate(-45deg)}
+
+    .overlayClickCatcher{
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      display:none;
+      background: transparent; /* invisible layer that catches clicks */
+    }
+
+    .mobileMenu{
+      position: fixed;
+      top: var(--navH);
+      right: 14px;
+      width: min(320px, calc(100vw - 28px));
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 26px 80px rgba(16,24,40,.18);
+      padding: 10px;
+      z-index: 300;
+      display:none;
+    }
+    .mobileMenu a{
+      display:block;
+      padding: 12px 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      color: #202331;
+      border: 1px solid transparent;
+      transition: background .18s ease, transform .18s ease;
+    }
+    .mobileMenu a:hover{background: rgba(91,61,245,.07); transform: translateY(-1px);}
+    .mobileMenu a:focus{outline:none; box-shadow: var(--focus);}
+    .mobileMenu .divider{height:1px; background: rgba(0,0,0,.08); margin: 8px 4px;}
+
+    /* =========================================================
+       6) HERO SLIDESHOW
+       ========================================================= */
+    .hero{
+      min-height: 100svh;
+      height: 100vh;
+      padding-top: var(--navH);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .lightStrip{
+      position:absolute; left:0; right:0;
+      top: calc(var(--navH) - 1px);
+      height: 4px;
+      background: linear-gradient(90deg,
+        rgba(216,27,96,0),
+        rgba(216,27,96,.75),
+        rgba(0,119,182,.65),
+        rgba(91,61,245,.65),
+        rgba(184,107,0,.38),
+        rgba(216,27,96,0)
+      );
+      opacity:.85;
+      animation: strip 6.2s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes strip{0%,100%{transform: translateX(-10%)}50%{transform: translateX(10%)}}
+
+    .slides{
+      position:absolute;
+      inset: var(--navH) 0 0 0;
+      height: calc(100% - var(--navH));
+    }
+    .slide{
+      position:absolute; inset:0;
+      opacity:0;
+      transform: scale(1.02);
+      transition: opacity .75s ease, transform 1.05s ease;
+      will-change: opacity, transform;
+    }
+    .slide.active{opacity:1; transform: scale(1);}
+    .slideBg{position:absolute; inset:0; background-size: cover; background-position:center;}
+    .slideOverlay{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
+        radial-gradient(900px 600px at 85% 20%, rgba(255,255,255,.38), transparent 56%),
+        linear-gradient(90deg, rgba(255,255,255,.75), rgba(255,255,255,.22)),
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.60));
+      pointer-events:none;
+    }
+
+    .heroContent{
+      position:relative;
+      height: calc(100% - var(--navH));
+      display:flex;
+      align-items:flex-end;
+    }
+    .heroCard{
+      width: min(820px, 94vw);
+      margin-bottom: 34px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      animation: cardFloat 7s ease-in-out infinite;
+    }
+    @keyframes cardFloat{0%,100%{transform: translateY(0)}50%{transform: translateY(-4px)}}
+    .heroCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(700px 280px at 18% 0%, rgba(216,27,96,.10), transparent 60%),
+        radial-gradient(700px 280px at 86% 20%, rgba(0,119,182,.10), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .heroCardIn{position:relative; padding: 18px 18px 16px;}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.95);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .dot{width:9px; height:9px; border-radius:999px; background: linear-gradient(135deg, var(--cyan), var(--pink));}
+
+    h1{
+      margin: 12px 0 8px;
+      font-size: clamp(34px, 4.2vw, 58px);
+      line-height:1.02;
+      letter-spacing:-0.03em;
+    }
+    .koko{
+      background: linear-gradient(135deg, var(--pink), var(--cyan), var(--violet));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .sub{
+      margin:0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height:1.65;
+      max-width: 62ch;
+    }
+    .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:10px;}
+    .meta{display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px;}
+    .badge{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.92);
+      color: #24283a;
+      font-size: 13px;
+    }
+
+    .sliderUI{position:absolute; left:0; right:0; bottom: 22px; z-index:80;}
+    .sliderIn{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+    .controls{display:flex; gap:10px; align-items:center;}
+
+    .navBtn{
+      width:44px; height:44px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 14px 40px rgba(16,24,40,.12);
+      cursor:pointer;
+      display:grid; place-items:center;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    .navBtn:hover{transform: translateY(-1px); background:#fff; box-shadow: 0 18px 52px rgba(16,24,40,.14)}
+    .navBtn:focus{outline:none; box-shadow: var(--focus), 0 18px 52px rgba(16,24,40,.14);}
+
+    .dots{
+      display:flex; gap:8px; align-items:center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 14px 40px rgba(16,24,40,.12);
+    }
+    .dotBtn{
+      width: 10px; height: 10px; border-radius: 99px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(0,0,0,.10);
+      cursor:pointer;
+      transition: width .18s ease, background .18s ease;
+    }
+    .dotBtn[aria-current="true"]{
+      width: 28px;
+      background: linear-gradient(135deg, rgba(216,27,96,.90), rgba(0,119,182,.82));
+      border-color: rgba(0,0,0,.14);
+    }
+    .dotBtn:focus{outline:none; box-shadow: var(--focus);}
+
+    /* Now Playing mini-player (mock UI) */
+    .player{
+      display:flex; align-items:center; gap:12px;
+      padding:10px 12px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 14px 40px rgba(16,24,40,.12);
+      max-width: min(540px, 95vw);
+      animation: breathe 6.8s ease-in-out infinite;
+    }
+    @keyframes breathe{0%,100%{transform: translateY(0)}50%{transform: translateY(-2px)}}
+    .album{
+      width:42px; height:42px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.10);
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.95), transparent 55%),
+        linear-gradient(135deg, rgba(216,27,96,.55), rgba(0,119,182,.35), rgba(91,61,245,.45));
+      position:relative; overflow:hidden;
+    }
+    .album::after{
+      content:"";
+      position:absolute; inset:-30% -60%;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,.45), transparent);
+      transform: translateX(-30%);
+      animation: shine 4.6s ease-in-out infinite;
+      opacity:.7;
+    }
+    @keyframes shine{0%,100%{transform: translateX(-35%)}50%{transform: translateX(35%)}}
+
+    .miniBtn{
+      width:40px; height:40px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.92);
+      cursor:pointer;
+      display:grid; place-items:center;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    .miniBtn:hover{transform: translateY(-1px); background:#fff; box-shadow: 0 14px 32px rgba(16,24,40,.12)}
+    .miniBtn:focus{outline:none; box-shadow: var(--focus);}
+
+    .track{min-width:0; flex:1 1 auto;}
+    .trackTop{display:flex; justify-content:space-between; gap:12px; align-items:center;}
+    .trackName{font-size:13px; font-weight:750; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .trackMeta{font-size:12px; color: var(--muted); white-space:nowrap;}
+    .bar{
+      margin-top:8px;
+      height:7px;
+      border-radius: 99px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, rgba(216,27,96,.92), rgba(0,119,182,.78), rgba(91,61,245,.70));
+      transition: width .25s linear;
+    }
+
+    /* =========================================================
+       7) MAIN CONTENT
+       ========================================================= */
+    main{padding: 34px 0 64px;}
+    section{padding: 28px 0;}
+    .sectionHead{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:16px; flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+    h2{margin:0; font-size:22px; letter-spacing:-0.02em;}
+    .lead{margin:0; color: var(--muted); font-size:14px; line-height:1.65; max-width: 70ch;}
+
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .card{
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.88);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transition: transform .20s ease, box-shadow .20s ease;
+    }
+    .card:hover{transform: translateY(-4px); box-shadow: 0 24px 70px rgba(16,24,40,.14);}
+    .card:focus-within{box-shadow: var(--focus), 0 24px 70px rgba(16,24,40,.14);}
+    .cardImg{
+      height: 170px;
+      background-size: cover;
+      background-position:center;
+      border-bottom: 1px solid var(--line);
+    }
+    .cardIn{padding: 14px;}
+    .kicker{display:inline-flex; align-items:center; gap:8px; font-size:12px; color: var(--muted); margin-bottom: 8px;}
+    .kDot{width:8px; height:8px; border-radius:999px; background: linear-gradient(135deg, var(--pink), var(--cyan));}
+    .cardTitle{margin:0 0 6px; font-size:16px;}
+    .cardText{margin:0; color: var(--muted); font-size:13px; line-height:1.6;}
+
+    .bookStrip{
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr .9fr auto;
+      gap: 10px;
+      align-items:end;
+    }
+    input, select{
+      width:100%;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: #fff;
+      padding: 0 12px;
+      font-size: 13px;
+      color: #12131a;
+    }
+    input:focus, select:focus{outline:none; box-shadow: var(--focus);}
+
+    footer{border-top: 1px solid var(--line); background: rgba(255,255,255,.85); padding: 28px 0 42px;}
+    .foot{display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; color: var(--muted); font-size: 13px;}
+
+    /* =========================================================
+       8) RESPONSIVE
+       ========================================================= */
+    @media (max-width: 980px){
+      nav.primary{display:none;}
+      .hamburger{display:inline-block;}
+      .bookStrip{grid-template-columns: 1fr 1fr;}
+      .bookStrip .full{grid-column: 1 / -1;}
+      .cards{grid-template-columns: 1fr;}
+      .heroCard{margin-bottom: 26px;}
+      .navRight{min-width: auto;}
+    }
+
+    /* =========================================================
+       9) REDUCED MOTION SUPPORT (WCAG friendly)
+       ========================================================= */
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto !important;}
+      *{animation:none !important; transition:none !important;}
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- =========================================================
+       LOGIN SCREEN
+       ---------------------------------------------------------
+       ✅ Change login logo file here (SVG recommended):
+          - login-logo.svg  (best)
+          - login-logo.png  (fine)
+       If the file is missing, the site still works.
+       ========================================================= -->
+  <div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Password required">
+    <div class="gateCard">
+      <div class="gateIn">
+        <div class="gateTop">
+          <div class="gateLogo" aria-hidden="true">
+            <img src="login-logo.svg" alt=""
+                 onerror="this.style.display='none';" />
+          </div>
+          <div>
+            <h2 class="gateTitle">Portfolio access</h2>
+            <p class="gateSub">Enter the access code to view this case study.</p>
+          </div>
+        </div>
+
+        <form class="gateForm" id="gateForm">
+          <div class="field">
+            <label for="pw">Access code</label>
+            <input id="pw" type="password" autocomplete="off" placeholder="Enter code…" />
+          </div>
+
+          <button class="btn btnPrimary" type="submit">Unlock</button>
+
+          <p class="gateError" id="gateError">Incorrect code. Try again.</p>
+
+          <p class="gateHint">
+            Thanks for your interest in our work. Please email
+            <a href="mailto:psizomeinc@gmail.com">psizomeinc@gmail.com</a>
+            for an access code.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       SITE CONTENT WRAPPER
+       ---------------------------------------------------------
+       IMPORTANT:
+       - The site is hidden until unlocked.
+       - JS will remove the [hidden] attribute after login.
+       ========================================================= -->
+  <div id="site" hidden>
+
+    <!-- =========================================================
+         HEADER / NAV
+         ---------------------------------------------------------
+         ✅ Nav links scroll to correct sections
+         ✅ Clicking KOKO logo scrolls to top (#top)
+         ✅ Mobile menu hamburger accessible
+         ========================================================= -->
+    <header class="nav" role="banner">
+      <div class="wrap navIn">
+
+        <!-- Logo scrolls to top -->
+        <a class="brand" href="#top" aria-label="KOKO home (scroll to top)">
+          <img src="koko-logo_bw.png" alt="KOKO logo" />
+        </a>
+
+        <!-- Desktop navigation -->
+        <nav class="primary" aria-label="Primary navigation">
+          <a href="#stay">Stay</a>
+          <a href="#dine">Dine</a>
+          <a href="#wellness">Wellness</a>
+          <a href="#gather">Gather</a>
+          <a href="#explore">Explore</a>
+          <a href="#offers">Offers</a>
+        </nav>
+
+        <div class="navRight">
+          <a class="btn" href="#book">Reservations</a>
+
+          <!-- Hamburger shows on mobile only -->
+          <button
+            class="hamburger"
+            id="menuBtn"
+            type="button"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="mobileMenu">
+            <span class="line l1"></span>
+            <span class="line l2"></span>
+            <span class="line l3"></span>
+          </button>
+
+          <button class="btn btnPrimary" id="jumpRooms" type="button">View suites</button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Invisible overlay that closes menu when clicking outside -->
+    <div class="overlayClickCatcher" id="overlayClickCatcher" aria-hidden="true"></div>
+
+    <!-- Mobile nav menu -->
+    <div class="mobileMenu" id="mobileMenu" role="menu" aria-label="Mobile navigation">
+      <a href="#stay" role="menuitem">Stay</a>
+      <a href="#dine" role="menuitem">Dine</a>
+      <a href="#wellness" role="menuitem">Wellness</a>
+      <a href="#gather" role="menuitem">Gather</a>
+      <a href="#explore" role="menuitem">Explore</a>
+      <a href="#offers" role="menuitem">Offers</a>
+      <div class="divider"></div>
+      <a href="#book" role="menuitem">Reservations</a>
+    </div>
+
+    <!-- =========================================================
+         HERO (top)
+         ---------------------------------------------------------
+         ✅ Slide 1 uses your local file: koko_bg-1.png
+         ✅ Replace slide images by editing background-image URLs
+         ========================================================= -->
+    <section class="hero" id="top" aria-label="Hero slideshow">
+      <div class="lightStrip" aria-hidden="true"></div>
+
+      <div class="slides" id="slides">
+        <div class="slide active" data-title="Bright stays. Bay views." data-sub="K-pop energy, boutique calm—right on Ha Long Bay.">
+          <div class="slideBg" style="background-image:url('koko_bg-1.png');"></div>
+          <div class="slideOverlay"></div>
+        </div>
+
+        <div class="slide" data-title="Rooftop glow, done tastefully." data-sub="Sunset lounge + city-pop nights (no chaos, just vibe).">
+          <div class="slideBg" style="background-image:url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2400&q=80');"></div>
+          <div class="slideOverlay"></div>
+        </div>
+
+        <div class="slide" data-title="Suites built for rest—and content." data-sub="Soft lighting, premium textures, and clean lines that look expensive.">
+          <div class="slideBg" style="background-image:url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=2400&q=80');"></div>
+          <div class="slideOverlay"></div>
+        </div>
+      </div>
+
+      <div class="wrap heroContent">
+        <div class="heroCard">
+          <div class="heroCardIn">
+            <div class="pill"><span class="dot"></span><span>Ha Long Bay, Vietnam • Boutique hotel for young travelers</span></div>
+
+            <h1>
+              Welcome to <span class="koko">KOKO</span><br />
+              <span id="heroTitle">Bright stays. Bay views.</span>
+            </h1>
+
+            <p class="sub" id="heroSub">K-pop energy, boutique calm—right on Ha Long Bay.</p>
+
+            <div class="actions">
+              <a class="btn btnPrimary" href="#book">Check availability</a>
+              <button class="btn" id="toggleAuto" type="button">Pause slideshow</button>
+            </div>
+
+            <div class="meta" aria-label="Highlights">
+              <div class="badge">🌞 Bright, airy interiors</div>
+              <div class="badge">🎧 “Now Playing” lounge sets</div>
+              <div class="badge">🛶 Bay cruise concierge</div>
+              <div class="badge">📸 Photo-ready corners</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sliderUI">
+        <div class="wrap sliderIn">
+          <!-- Now Playing mini-player -->
+          <div class="player" aria-label="Now Playing mini-player">
+            <div class="album" aria-hidden="true"></div>
+
+            <button class="miniBtn" id="playBtn" aria-label="Play or pause">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" id="playIcon">
+                <path d="M9 7.5v9l8-4.5-8-4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <div class="track">
+              <div class="trackTop">
+                <div class="trackName" id="trackName">KOKO Daylight (Pop Chill)</div>
+                <div class="trackMeta" id="trackMeta">00:10 • Lobby</div>
+              </div>
+              <div class="bar" id="bar" aria-label="Track progress (mock)">
+                <div class="fill" id="fill"></div>
+              </div>
+            </div>
+
+            <button class="miniBtn" id="prevTrack" aria-label="Previous track">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 7l-6 5 6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <button class="miniBtn" id="nextTrack" aria-label="Next track">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 7l6 5-6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Slideshow controls -->
+          <div class="controls" aria-label="Slideshow controls">
+            <button class="navBtn" id="prev" aria-label="Previous slide">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <div class="dots" id="dots" aria-label="Slide dots"></div>
+
+            <button class="navBtn" id="next" aria-label="Next slide">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+    <main id="main" tabindex="-1">
+
+      <section id="book" aria-label="Reservations">
+        <div class="wrap">
+          <div class="sectionHead">
+            <div>
+              <h2>Reservations</h2>
+              <p class="lead">Quick check (mock). Easy to connect to a real booking system later.</p>
+            </div>
+          </div>
+
+          <form class="bookStrip" onsubmit="return false" aria-label="Booking form">
+            <div class="full" style="grid-column:1 / -1; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <span class="pill"><span class="dot"></span>Best rates when booking direct</span>
+            </div>
+
+            <div>
+              <label for="checkin">Check-in</label>
+              <input id="checkin" type="date" />
+            </div>
+            <div>
+              <label for="checkout">Check-out</label>
+              <input id="checkout" type="date" />
+            </div>
+            <div>
+              <label for="guests">Guests</label>
+              <select id="guests">
+                <option>1</option>
+                <option selected>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select>
+            </div>
+            <div class="full" style="grid-column:auto;">
+              <label for="roomtype">Room</label>
+              <select id="roomtype">
+                <option selected>Bay View Suite</option>
+                <option>Bright Deluxe</option>
+                <option>Studio King</option>
+              </select>
+            </div>
+
+            <button class="btn btnPrimary" id="checkRates" type="button">Check rates</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="stay" aria-label="Stay">
+        <div class="wrap">
+          <div class="sectionHead">
+            <div>
+              <h2>Stay</h2>
+              <p class="lead">Suites and rooms with bright lighting, premium comfort, and photo-friendly details.</p>
+            </div>
+            <a class="btn" href="#book">Book now</a>
+          </div>
+
+          <div class="cards">
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Signature</div>
+                <h3 class="cardTitle">Bay View Suite</h3>
+                <p class="cardText">Big windows, soft neon accents, and a calm palette that stays premium.</p>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Popular</div>
+                <h3 class="cardTitle">Bright Deluxe</h3>
+                <p class="cardText">Airy + cheerful. Built for recovery after a day on the bay.</p>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Creator-ready</div>
+                <h3 class="cardTitle">Studio King</h3>
+                <p class="cardText">Great desk, tidy layout, and lighting that makes your skin look good.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="dine" aria-label="Dine">
+        <div class="wrap">
+          <div class="sectionHead">
+            <div>
+              <h2>Dine</h2>
+              <p class="lead">Café • Rooftop • Late-night bites — short and conversion-friendly.</p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>All day</div>
+                <h3 class="cardTitle">Glow Tea Café</h3>
+                <p class="cardText">Yuzu, lychee, jasmine—bright flavors, clean visuals.</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Sunset</div>
+                <h3 class="cardTitle">Rooftop Lounge</h3>
+                <p class="cardText">Tasteful lighting + bay views. Music stays vibey, not obnoxious.</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Late</div>
+                <h3 class="cardTitle">Night Bites</h3>
+                <p class="cardText">Light snacks that hit after exploring (or dancing).</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="wellness" aria-label="Wellness">
+        <div class="wrap">
+          <div class="sectionHead">
+            <div>
+              <h2>Wellness</h2>
+              <p class="lead">Massage • recovery • sauna — swap in your actual services.</p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Reset</div>
+                <h3 class="cardTitle">Spa Treatments</h3>
+                <p class="cardText">Short list, high quality. Built for travelers with tight schedules.</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1551887373-6a8f5dca13f4?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Move</div>
+                <h3 class="cardTitle">Fitness + Stretch</h3>
+                <p class="cardText">Simple, clean gym zone + guided recovery routines.</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Breathe</div>
+                <h3 class="cardTitle">Morning Calm</h3>
+                <p class="cardText">Bay-side mornings that don’t require a million steps.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="gather" aria-label="Gather">
+        <div class="wrap">
+          <div class="sectionHead">
+            <div>
+              <h2>Gather</h2>
+              <p class="lead">Small weddings, content shoots, brand events—clean layout without clutter.</p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Signature</div>
+                <h3 class="cardTitle">Rooftop Events</h3>
+                <p class="cardText">Golden hour + clean AV. Perfect for intimate celebrations.</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Creator</div>
+                <h3 class="cardTitle">Shoots + Launches</h3>
+                <p class="cardText">Photo-ready corners and staff that understands production needs.</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Simple</div>
+                <h3 class="cardTitle">Request for Proposal</h3>
+                <p class="cardText">Next page idea: a clean inquiry form (portfolio win).</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="explore" aria-label="Explore">
+        <div class="wrap">
+          <div class="sectionHead">
+            <div>
+              <h2>Explore</h2>
+              <p class="lead">Curated Ha Long Bay itineraries—editorial and useful (not tourist brochure).</p>
+            </div>
+          </div>
+
+        <div class="cards">
+          <article class="card">
+            <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1504609813442-a8924e83f76e?auto=format&fit=crop&w=1800&q=80')"></div>
+            <div class="cardIn">
+              <div class="kicker"><span class="kDot"></span>Top pick</div>
+              <h3 class="cardTitle">Sunrise Cruise</h3>
+              <p class="cardText">We book the better boats—smaller groups, better timing.</p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1800&q=80')"></div>
+            <div class="cardIn">
+              <div class="kicker"><span class="kDot"></span>Food</div>
+              <h3 class="cardTitle">Local Eats Map</h3>
+              <p class="cardText">Short list of hits. Skip the mediocre stuff.</p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80')"></div>
+            <div class="cardIn">
+              <div class="kicker"><span class="kDot"></span>Night</div>
+              <h3 class="cardTitle">KOKO Happenings</h3>
+              <p class="cardText">Rooftop sets, pop-ups, and soft-launch events.</p>
+            </div>
+          </article>
+        </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           OFFERS — how to hide:
+           1) Remove Offers nav link:
+              <!-- <a href="#offers">Offers</a> -->
+           2) Comment this whole section:
+              <!--
+              <section id="offers"> ... </section>
+              -->
+           ========================================================= -->
+      <section id="offers" aria-label="Offers">
+        <div class="wrap">
+          <div class="sectionHead">
+            <div>
+              <h2>Offers</h2>
+              <p class="lead">Seasonal packages + stay longer + spa credits (placeholders).</p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Featured</div>
+                <h3 class="cardTitle">Stay More, Save More</h3>
+                <p class="cardText">Longer stays unlock a better nightly rate (placeholder).</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Wellness</div>
+                <h3 class="cardTitle">Spa Reset Credit</h3>
+                <p class="cardText">A small credit feels premium without heavy discounting.</p>
+              </div>
+            </article>
+            <article class="card">
+              <div class="cardImg" style="background-image:url('https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1800&q=80')"></div>
+              <div class="cardIn">
+                <div class="kicker"><span class="kDot"></span>Couples</div>
+                <h3 class="cardTitle">Rooftop + Bubbles</h3>
+                <p class="cardText">Sunset table + curated tasting (placeholder).</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer role="contentinfo">
+      <div class="wrap foot">
+        <div>© <span id="year"></span> KOKO • Ha Long Bay, Vietnam</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap">
+          <a href="#stay">Stay</a>
+          <a href="#dine">Dine</a>
+          <a href="#wellness">Wellness</a>
+          <a href="#book">Reservations</a>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /#site -->
+
+  <script>
+    /* =========================================================
+       DEV MODE: bypass password during development
+       ---------------------------------------------------------
+       ✅ Set to true while building (no login needed)
+       ✅ Set to false before sharing
+       ========================================================= */
+    const DEV_BYPASS_PASSWORD = false; // <-- change to true to disable the gate
+
+    /* =========================================================
+       PASSWORD GATE (polite gate, NOT real security)
+       ---------------------------------------------------------
+       ✅ CHANGE PASSWORD HERE:
+       ========================================================= */
+    const ACCESS_PASSWORD = "PSI"; // <-- change this whenever you want
+    const ACCESS_KEY = "koko_portfolio_access";
+
+    const gate = document.getElementById("gate");
+    const gateForm = document.getElementById("gateForm");
+    const pwInput = document.getElementById("pw");
+    const gateError = document.getElementById("gateError");
+    const site = document.getElementById("site");
+
+    function showGate(){
+      gate.style.display = "grid";
+      site.hidden = true;
+      gateError.style.display = "none";
+      setTimeout(() => pwInput.focus(), 50);
+    }
+
+    function showSite(){
+      gate.style.display = "none";
+      site.hidden = false;
+      const main = document.getElementById("main");
+      if (main) main.focus({preventScroll:true});
+    }
+
+    // Decide what to show on load:
+    if (DEV_BYPASS_PASSWORD) {
+      showSite();
+    } else if (sessionStorage.getItem(ACCESS_KEY) === "true") {
+      showSite();
+    } else {
+      showGate();
+    }
+
+    // When user submits password
+    gateForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const entered = (pwInput.value || "").trim();
+      if (entered === ACCESS_PASSWORD){
+        sessionStorage.setItem(ACCESS_KEY, "true");
+        showSite();
+      } else {
+        gateError.style.display = "block";
+        pwInput.select();
+      }
+    });
+
+    /* =========================================================
+       RESPECT REDUCED MOTION (WCAG)
+       ========================================================= */
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* =========================================================
+       HERO SLIDESHOW
+       ========================================================= */
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dotsWrap = document.getElementById("dots");
+    const heroTitle = document.getElementById("heroTitle");
+    const heroSub = document.getElementById("heroSub");
+    const toggleAutoBtn = document.getElementById("toggleAuto");
+
+    let index = 0;
+    let auto = true;
+    let interval = null;
+    const AUTO_MS = 5200; // slower/faster: change this number
+
+    function setHeroText(i){
+      const s = slides[i];
+      heroTitle.textContent = s.dataset.title || "Bright stays. Bay views.";
+      heroSub.textContent = s.dataset.sub || "K-pop energy, boutique calm—right on Ha Long Bay.";
+    }
+
+    function renderDots(){
+      dotsWrap.innerHTML = "";
+      slides.forEach((_, i) => {
+        const b = document.createElement("button");
+        b.className = "dotBtn";
+        b.type = "button";
+        b.setAttribute("aria-label", `Go to slide ${i+1}`);
+        b.setAttribute("aria-current", i === index ? "true" : "false");
+        b.addEventListener("click", () => go(i, true));
+        dotsWrap.appendChild(b);
+      });
+    }
+
+    function go(i, user=false){
+      index = (i + slides.length) % slides.length;
+      slides.forEach((s, idx) => s.classList.toggle("active", idx === index));
+      setHeroText(index);
+      renderDots();
+      if (user) restartAuto();
+    }
+
+    function next(user=false){ go(index + 1, user); }
+    function prev(user=false){ go(index - 1, user); }
+
+    function startAuto(){
+      if (prefersReduced) return;
+      if (!auto) return;
+      clearInterval(interval);
+      interval = setInterval(() => next(false), AUTO_MS);
+    }
+    function stopAuto(){ clearInterval(interval); interval = null; }
+    function restartAuto(){ stopAuto(); startAuto(); }
+
+    document.getElementById("next").addEventListener("click", () => next(true));
+    document.getElementById("prev").addEventListener("click", () => prev(true));
+
+    toggleAutoBtn.addEventListener("click", () => {
+      auto = !auto;
+      toggleAutoBtn.textContent = auto ? "Pause slideshow" : "Play slideshow";
+      if (auto) startAuto(); else stopAuto();
+    });
+
+    // Keyboard arrows for slideshow
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") next(true);
+      if (e.key === "ArrowLeft") prev(true);
+    });
+
+    // Swipe (mobile)
+    let startX = null;
+    const slidesEl = document.getElementById("slides");
+    slidesEl.addEventListener("pointerdown", (e) => { startX = e.clientX; });
+    slidesEl.addEventListener("pointerup", (e) => {
+      if (startX == null) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 40) (dx < 0) ? next(true) : prev(true);
+      startX = null;
+    });
+
+    setHeroText(index);
+    renderDots();
+    startAuto();
+
+    /* =========================================================
+       NOW PLAYING (mock)
+       ========================================================= */
+    const tracks = [
+      { name:"KOKO Daylight (Pop Chill)", mood:"Lobby",   dur: 160 },
+      { name:"Rooftop Spark (City Pop)",  mood:"Rooftop", dur: 188 },
+      { name:"Bay Breeze (Chillwave)",    mood:"Morning", dur: 172 }
+    ];
+    let trackIndex = 0;
+    let playing = false;
+    let t = 0;
+    let timer = null;
+
+    const playBtn = document.getElementById("playBtn");
+    const playIcon = document.getElementById("playIcon");
+    const fill = document.getElementById("fill");
+    const trackName = document.getElementById("trackName");
+    const trackMeta = document.getElementById("trackMeta");
+    const bar = document.getElementById("bar");
+
+    function fmt(sec){
+      const m = String(Math.floor(sec/60)).padStart(2,"0");
+      const s = String(Math.floor(sec%60)).padStart(2,"0");
+      return `${m}:${s}`;
+    }
+    function setTrack(i){
+      trackIndex = (i + tracks.length) % tracks.length;
+      const tr = tracks[trackIndex];
+      trackName.textContent = tr.name;
+      t = 0;
+      fill.style.width = "0%";
+      trackMeta.textContent = `${fmt(t)} • ${tr.mood}`;
+    }
+    function setPlayIcon(){
+      playIcon.innerHTML = playing
+        ? `<path d="M8.5 7.5v9M15.5 7.5v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`
+        : `<path d="M9 7.5v9l8-4.5-8-4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>`;
+    }
+    function tick(){
+      const tr = tracks[trackIndex];
+      t += 1;
+      if (t >= tr.dur){
+        setTrack(trackIndex + 1);
+      } else {
+        fill.style.width = `${(t/tr.dur)*100}%`;
+        trackMeta.textContent = `${fmt(t)} • ${tr.mood}`;
+      }
+    }
+    function play(){
+      if (prefersReduced) return;
+      playing = true; setPlayIcon();
+      clearInterval(timer);
+      timer = setInterval(tick, 1000);
+    }
+    function pause(){
+      playing = false; setPlayIcon();
+      clearInterval(timer);
+      timer = null;
+    }
+    playBtn.addEventListener("click", () => playing ? pause() : play());
+    document.getElementById("nextTrack").addEventListener("click", () => setTrack(trackIndex + 1));
+    document.getElementById("prevTrack").addEventListener("click", () => setTrack(trackIndex - 1));
+    bar.addEventListener("click", (e) => {
+      const rect = bar.getBoundingClientRect();
+      const pct = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      const tr = tracks[trackIndex];
+      t = Math.floor(pct * tr.dur);
+      fill.style.width = `${pct*100}%`;
+      trackMeta.textContent = `${fmt(t)} • ${tr.mood}`;
+    });
+
+    setTrack(0);
+    setPlayIcon();
+
+    /* =========================================================
+       NAV SHORTCUT BUTTON
+       ========================================================= */
+    document.getElementById("jumpRooms").addEventListener("click", () => {
+      document.getElementById("stay").scrollIntoView({behavior: prefersReduced ? "auto" : "smooth"});
+    });
+
+    /* =========================================================
+       MOBILE MENU (accessible)
+       ========================================================= */
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const overlay = document.getElementById("overlayClickCatcher");
+    let lastFocusedElement = null;
+
+    function openMenu(){
+      lastFocusedElement = document.activeElement;
+      menuBtn.setAttribute("aria-expanded","true");
+      menuBtn.setAttribute("aria-label","Close menu");
+      mobileMenu.style.display = "block";
+      overlay.style.display = "block";
+      const firstLink = mobileMenu.querySelector("a");
+      if (firstLink) firstLink.focus();
+    }
+
+    function closeMenu(){
+      menuBtn.setAttribute("aria-expanded","false");
+      menuBtn.setAttribute("aria-label","Open menu");
+      mobileMenu.style.display = "none";
+      overlay.style.display = "none";
+      if (lastFocusedElement) lastFocusedElement.focus();
+    }
+
+    function isMenuOpen(){
+      return menuBtn.getAttribute("aria-expanded") === "true";
+    }
+
+    menuBtn.addEventListener("click", () => isMenuOpen() ? closeMenu() : openMenu());
+    overlay.addEventListener("click", closeMenu);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isMenuOpen()) closeMenu();
+    });
+
+    mobileMenu.querySelectorAll("a").forEach(a => {
+      a.addEventListener("click", () => closeMenu());
+    });
+
+    /* =========================================================
+       BOOKING DEFAULT DATES + FOOTER YEAR
+       ========================================================= */
+    const today = new Date();
+    const addDays = (d) => {
+      const n = new Date(today);
+      n.setDate(n.getDate() + d);
+      return n.toISOString().slice(0,10);
+    };
+    document.getElementById("checkin").value = addDays(7);
+    document.getElementById("checkout").value = addDays(10);
+
+    document.getElementById("checkRates").addEventListener("click", () => {
+      alert("Mock: From ~$159/night • Free cancel • 24h hold");
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    /* =========================================================
+       SIMPLE INSTRUCTIONS: GitHub Pages hosting
+       ---------------------------------------------------------
+       1) Create a GitHub repo (example: koko)
+       2) Upload:
+          - index.html (this file)
+          - koko-logo_bw.png
+          - koko_bg-1.png
+          - login-logo.svg (optional, for gate logo)
+       3) Repo Settings → Pages:
+          - Deploy from branch
+          - main / (root)
+       4) Your site is live at:
+          https://YOURUSERNAME.github.io/REPO/
+       ========================================================= */
+
+    /* =========================================================
+       SIMPLE INSTRUCTIONS: Disable password during dev
+       ---------------------------------------------------------
+       Set:
+          const DEV_BYPASS_PASSWORD = true;
+       Then the gate is skipped and the site shows immediately.
+       ========================================================= */
+  </script>
+</body>
+</html>
