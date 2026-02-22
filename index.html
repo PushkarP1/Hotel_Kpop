@@ -483,7 +483,7 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
       padding: 10px 14px;
       border-radius: 999px;
       border: 0px solid rgba(0,0,0,.10);
-      background: rgba(255,255,255,.2);
+      background: rgba(255,255,255,.4);
       backdrop-filter: blur(4px);
       font-size: 13px;
       color: var(--muted);
@@ -512,8 +512,8 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
     .badge{
       padding: 10px 12px;
       border-radius: 14px;
-      border: 1px solid rgba(0,0,0,.10);
-      background: rgba(255,255,255,.92);
+      border: 0px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.4);
       color: #24283a;
       font-size: 13px;
     }
@@ -1437,13 +1437,11 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
     document.getElementById("next").addEventListener("click", () => next(true));
     document.getElementById("prev").addEventListener("click", () => prev(true));
 
-    /*
     toggleAutoBtn.addEventListener("click", () => {
       auto = !auto;
       toggleAutoBtn.textContent = auto ? "Pause slideshow" : "▶️";
       if (auto) startAuto(); else stopAuto();
     });
-    */
 
     // Keyboard arrows for slideshow
     window.addEventListener("keydown", (e) => {
