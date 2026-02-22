@@ -220,18 +220,7 @@
 <<<<<<< HEAD
       background: transparent;     /* transparent at top */
       transition: background .35s ease, backdrop-filter .35s ease;
-      /* Make nav links white when nav becomes dark */
-      header.nav.scrolled nav.primary a{
-      color: #ffffff;
-}
       }
-
-      /* Nav after user scrolls */
-      header.nav.scrolled{
-      background: rgba(30,30,35,.92);  /* dark grey */
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-}
       
 =======
       background: rgba(0, 0, 0, 0.30);   /* 30% black  "transparent"*/
@@ -1203,22 +1192,6 @@
   </div><!-- /#site -->
 
   <script>
-
-    /* =========================================================
-      NAV SCROLL EFFECT
-      Transparent at top → dark when scrolling
-      ========================================================= */
-      const nav = document.querySelector("header.nav");
-
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 40) {  // trigger point
-        nav.classList.add("scrolled");
-      } else {
-        nav.classList.remove("scrolled");
-      }
-    });
-
-
     /* =========================================================
        DEV MODE: bypass password during development
        ---------------------------------------------------------
