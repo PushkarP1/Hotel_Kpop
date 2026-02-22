@@ -217,55 +217,47 @@
     header.nav{
       position:fixed; inset:0 0 auto 0; z-index: 200;
       height: var(--navH);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-      background: transparent;     /* transparent at top */
-      transition: background .35s ease, backdrop-filter .35s ease;
-      }
-      
-=======
-=======
->>>>>>> parent of e74132d (making nav background transparent)
-=======
->>>>>>> parent of e74132d (making nav background transparent)
-      background: rgba(0, 0, 0, 0.30);   /* 30% black  "transparent"*/
-      /*linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,.1)) */;
-      backdrop-filter: blur(8px);
-      border-bottom: 0px solid var(--line);
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of e74132d (making nav background transparent)
-=======
->>>>>>> parent of e74132d (making nav background transparent)
-=======
->>>>>>> parent of e74132d (making nav background transparent)
+      background: transparent; /* transparent at the very top */
+      transition: background .35s ease, backdrop-filter .35s ease, border-color .35s ease;
+      border-bottom: 1px solid transparent;
     }
+
+    /* When you scroll down, JS adds the class .scrolled to the header */
+    header.nav.scrolled{
+      background: rgba(30,30,35,.92);   /* dark grey */
+      backdrop-filter: blur(8px);       /* subtle glass */
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
     .navIn{
       height:100%;
       display:flex;
-      align-items:center;      /* vertical center everything */
+      align-items:center;          /* vertical center everything */
       justify-content:space-between;
-      gap: 20px;
+      gap: 18px;
+      flex-wrap: nowrap;           /* keep logo + links + buttons on ONE line */
     }
 
     /* Clicking the logo should scroll to the hero (#top) */
-    .brand{display:flex; align-items:center; gap:12px; min-width: 160px;}
-    .brand img{height: 34px; width:auto; display:block;} /* logo size */
+    .brand{display:flex; align-items:center; gap:12px; min-width: 0;} /* min-width:0 prevents forced wrapping */
+    .brand img{height: 28px; width:auto; display:block;} /* logo size: reduce to keep everything aligned */
 
     nav.primary{
       display:flex;
       align-items:center;
-      gap: 24px;          /* cleaner spacing */
-      flex-wrap: nowrap;  /* prevent wrapping */
+      justify-content:center;  /* keeps links in the middle */
+      gap: 22px;
+      flex: 1 1 auto;          /* take available space between logo and buttons */
+      min-width: 0;            /* allow shrinking without wrapping weirdly */
+      flex-wrap: nowrap;
     }
     
     nav.primary a{
       font-size: 13px;
       padding: 10px 12px;
       border-radius: 999px;
-      color: ffffff /* #202331; */
-      border: 0px solid transparent;
+      color: #ffffff; /* white links */
+      border: 1px solid transparent;
       transition: background .18s ease, transform .18s ease, border-color .18s ease;
     }
     nav.primary a:hover{
@@ -276,12 +268,30 @@
     nav.primary a:focus{outline:none; box-shadow: var(--focus);}
 
     .navRight{
-      display:flex; align-items:center; gap:10px;
-      min-width: 220px;
+      display:flex; align-items:center; gap:12px;
+      min-width: 0; /* allow flex layout to fit */
       justify-content:flex-end;
     }
 
-    /* =========================================================
+    
+    /* When nav is dark (scrolled), keep buttons readable */
+    header.nav.scrolled .btn{
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.25);
+      color: #fff;
+      box-shadow: none;
+    }
+    header.nav.scrolled .btnPrimary{
+      background: linear-gradient(135deg, rgba(216,27,96,.95), rgba(0,119,182,.92), rgba(91,61,245,.92));
+      border-color: rgba(255,255,255,.18);
+    }
+    header.nav.scrolled .hamburger{
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.25);
+      box-shadow: none;
+    }
+    header.nav.scrolled .hamburger .line{ background:#fff; }
+/* =========================================================
        5) MOBILE NAV (hamburger) — accessible
        ========================================================= */
     .hamburger{
@@ -390,12 +400,14 @@
     .slideOverlay{
       position:absolute; inset:0;
       background:
-        radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
+radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
         radial-gradient(900px 600px at 85% 20%, rgba(255,255,255,.38), transparent 56%),
         linear-gradient(90deg, rgba(255,255,255,.75), rgba(255,255,255,.22)),
         linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.60));
-        opacity: .2;          /* <-- Tune opacity of overlay - More overlay (brighter / safer for text): opacity: .60; | Less overlay (more photo): opacity: .25; */
+      opacity: .20; /* overlay strength: .60 brighter, .25 subtle */
       pointer-events:none;
+    }
+
     }
 
     .heroContent{
@@ -1261,6 +1273,17 @@
         gateError.style.display = "block";
         pwInput.select();
       }
+    });
+
+    /* =========================================================
+       NAV SCROLL EFFECT
+       ---------------------------------------------------------
+       Transparent at top → dark grey after you scroll a bit
+       ========================================================= */
+    const navEl = document.querySelector("header.nav");
+    window.addEventListener("scroll", () => {
+      if (!navEl) return;
+      navEl.classList.toggle("scrolled", window.scrollY > 40); // change 40 to 10/80 if you want
     });
 
     /* =========================================================
