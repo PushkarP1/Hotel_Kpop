@@ -713,12 +713,12 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
 
 .material-symbols-rounded {
   font-size: 1px;            /* change size here */
-  vertical-align: middle;     /* aligns with text */
-  margin-right: 2px;          /* space between icon and text */
+  vertical-align: top;     /* aligns with text */
+  margin-right: 1px;          /* space between icon and text */
 
   font-variation-settings:
     'FILL' 0,
-    'wght' 500,
+    'wght' 300,
     'GRAD' 0,
     'opsz' 24;
 }
@@ -1437,11 +1437,13 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
     document.getElementById("next").addEventListener("click", () => next(true));
     document.getElementById("prev").addEventListener("click", () => prev(true));
 
+    /*
     toggleAutoBtn.addEventListener("click", () => {
       auto = !auto;
       toggleAutoBtn.textContent = auto ? "Pause slideshow" : "▶️";
       if (auto) startAuto(); else stopAuto();
     });
+    */
 
     // Keyboard arrows for slideshow
     window.addEventListener("keydown", (e) => {
