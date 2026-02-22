@@ -396,8 +396,12 @@
 
     .slides{
       position:absolute;
+      /* 
       inset: var(--navH) 0 0 0;
-      height: calc(100% - var(--navH));
+      Height: calc(100% - var(--navH)); ← THIS pushes the slideshow down */
+      inset: 0;          /* ← start at the very top */
+      height: 100%;      /* ← fill the hero */
+      
     }
     .slide{
       position:absolute; inset:0;
