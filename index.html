@@ -56,6 +56,10 @@
       --max: 1180px;
       --navH: 72px;
 
+      /* HERO CARD vertical position (smaller = lower, bigger = higher) */
+      --heroCardBottom: 0px;
+      --heroContentPadBottom: 0px; /* add 20px if you want card a bit higher */
+
       /* Keyboard focus ring (WCAG friendly) */
       --focus: 0 0 0 3px rgba(0,119,182,.25), 0 0 0 6px rgba(91,61,245,.18);
 
@@ -228,6 +232,10 @@
       backdrop-filter: blur(8px);       /* subtle glass */
       border-bottom: 1px solid rgba(255,255,255,.08);
     }
+    header.nav.scrolled nav.primary a{
+      color: #ffffff;
+    }
+
 
     .navIn{
       height:100%;
@@ -253,10 +261,10 @@
     }
     
     nav.primary a{
-      font-size: 13px;
+      font-size: 16px;
       padding: 10px 12px;
       border-radius: 999px;
-      color: #ffffff; /* white links */
+      color: #000000; /* white links */
       border: 1px solid transparent;
       transition: background .18s ease, transform .18s ease, border-color .18s ease;
     }
@@ -415,6 +423,8 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
       height: calc(100% - var(--navH));
       display:flex;
       align-items:flex-end;
+      padding-bottom: var(--heroContentPadBottom);
+
     }
     .heroCard{
       width: min(640px, 90vw); 
@@ -422,7 +432,7 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
       So:
       First number = desktop size
       Second number = mobile width percentage */
-      margin-bottom: 10px;
+      margin-bottom: var(--heroCardBottom);
       border-radius: var(--radius);
       border: 0px solid var(--line);
       background: rgba(255,255,255,.11);
