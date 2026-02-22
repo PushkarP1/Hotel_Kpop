@@ -57,7 +57,7 @@
       --navH: 72px;
 
       /* HERO CARD vertical position (smaller = lower, bigger = higher) */
-      --heroCardBottom: 0px;
+      --heroCardBottom: 0px; /* extra tweak: use -20px to push DOWN more */
       --heroContentPadBottom: 0px; /* add 20px if you want card a bit higher */
 
       /* Keyboard focus ring (WCAG friendly) */
@@ -416,14 +416,12 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
       pointer-events:none;
     }
 
-    }
-
     .heroContent{
       position:relative;
       height: calc(100% - var(--navH));
       display:flex;
       align-items:flex-end;
-      Padding-bottom: 40px;   /* ← ADD THIS */
+      padding-bottom: 90px;   /* move hero card DOWN: try 60/90/120px */
 
     }
     .heroCard{
@@ -671,7 +669,7 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
       .bookStrip{grid-template-columns: 1fr 1fr;}
       .bookStrip .full{grid-column: 1 / -1;}
       .cards{grid-template-columns: 1fr;}
-      .heroCard{margin-bottom: 26px;}
+      .heroCard{margin-bottom: 0px;} /* keep card low on mobile */
       .navRight{min-width: auto;}
     }
 
