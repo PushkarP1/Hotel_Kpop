@@ -225,6 +225,7 @@
       position:fixed; inset:0 0 auto 0; z-index: 200;
       height: var(--navH);
       background: transparent; /* transparent at the very top */
+      backdrop-filter: blur(25px); /* nav blur bg */
       transition: background .35s ease, backdrop-filter .35s ease, border-color .35s ease;
       border-bottom: 1px solid transparent;
     }
@@ -432,7 +433,7 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
 
     }
     .heroCard{
-      width: min(640px, 90vw); 
+      width: min(600px, 90vw); 
       /* "Use 820px unless the screen is smaller — then use 94% of screen width.” 
       So:
       First number = desktop size
@@ -440,9 +441,9 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
       margin-bottom: var(--heroCardBottom);
       border-radius: var(--radius);
       border: 0px solid var(--line);
-      background: rgba(255,255,255,.11);
-      backdrop-filter: blur(4px);
-      box-shadow: var(--shadow);
+      background: rgba(255,255,255,0); /* last one is opacity. can be .1 but removing it for now. */
+      backdrop-filter: blur(25px);
+      /* box-shadow: var(--shadow); */
       overflow:hidden;
       position:relative;
       animation: cardFloat 7s ease-in-out infinite;
