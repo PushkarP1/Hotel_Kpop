@@ -805,7 +805,7 @@
 
             <div class="actions">
               <a class="btn btnPrimary" href="#book">Check availability</a>
-              <button class="btn" id="toggleAuto" type="button">⏸️ Pause slideshow</button>
+              <button class="btn" id="toggleAuto" type="button">⏸️</button>
             </div>
 
             <div class="meta" aria-label="Highlights">
@@ -1301,7 +1301,7 @@
 
     toggleAutoBtn.addEventListener("click", () => {
       auto = !auto;
-      toggleAutoBtn.textContent = auto ? "Pause slideshow" : "▶️ Play slideshow";
+      toggleAutoBtn.textContent = auto ? "Pause slideshow" : "▶️";
       if (auto) startAuto(); else stopAuto();
     });
 
