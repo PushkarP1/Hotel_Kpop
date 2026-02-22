@@ -13,9 +13,17 @@
   ========================================================== -->
 
   <meta charset="utf-8" />
+   <!-- Main font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+  
+
+  <style>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>KOKO - Boutique Hotel • Ha Long Bay</title>
-  <meta name="description" content="KOKO is a bright, K-pop inspired boutique hotel concept in Ha Long Bay, Vietnam." />
+  <meta name="description" content="KOKO is a bright, K-pop inspired boutique hotel concept in Hoi An, Vietnam." />
 
   <!-- Font (swap if you want) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -698,6 +706,23 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
       html{scroll-behavior:auto !important;}
       *{animation:none !important; transition:none !important;}
     }
+
+    /* ======================================
+   ICON SYSTEM (Clean + aligned)
+   ====================================== */
+
+.material-symbols-rounded {
+  font-size: 1px;            /* change size here */
+  vertical-align: middle;     /* aligns with text */
+  margin-right: 2px;          /* space between icon and text */
+
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 500,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
   </style>
 </head>
 
@@ -899,11 +924,23 @@ radial-gradient(900px 600px at 20% 20%, rgba(255,255,255,.62), transparent 58%),
             </div>
 
             <div class="meta" aria-label="Highlights">
-              <div class="badge">🌞 Bright, airy interiors</div>
+              
+              <div class="badge">
+              <span class="material-symbols-rounded">wb_sunny</span>
+              Bright, airy interiors  
+              </div>
+
               <!-- <div class="badge">🎧 “Now Playing” lounge sets</div> -->
-              <div class="badge">🛶 Bay cruise concierge</div>
-              <div class="badge">📸 Photo-ready corners</div>
-            </div>
+              <div class="badge">
+              <span class="material-symbols-rounded">directions_boat</span>
+              Bay cruises
+              </div>
+              
+              <div class="badge">
+              <span class="material-symbols-rounded">photo_camera</span>
+              Photo-Ops
+              </div>
+
           </div>
         </div>
       </div>
